@@ -1,0 +1,28 @@
+{
+  "orbits": [
+    {
+      "Name": "Astralis",
+      "ParentName": "Solara",
+      "Apoapsis": 6315765981.0,
+      "Periapsis": 4210510628.0,
+      "Inclination": 7.0,
+      "ArgumentOfPeriapsis": 15.0
+    },
+    {
+      "Name": "Veridian",
+      "ParentName": "Solara",
+      "Apoapsis": 9931011387.0,
+      "Periapsis": 9734357701.0,
+      "Inclination": 2.1,
+      "ArgumentOfPeriapsis": 0.0
+    },
+    {
+      "Name": "Lunara",
+      "ParentName": "Veridian",
+      "Apoapsis": 0.1,
+      "Periapsis": 0.09,
+      "Inclination": 1.0,
+      "ArgumentOfPeriapsis": 30.0
+    }
+  ]
+}
