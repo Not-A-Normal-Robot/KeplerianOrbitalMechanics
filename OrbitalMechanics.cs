@@ -2,6 +2,9 @@
 // his repo on his implementation: https://github.com/ScottyRAnderson/Keplerian-Orbits
 // his yt vid about this: https://www.youtube.com/watch?v=t89De819YMA (highly underrated btw, check him out)
 
+// However his code is kinda incomplete and doesn't account for longitude of ascending node.
+// I found an algorithm to account for it: https://downloads.rene-schwarz.com/download/M001-Keplerian_Orbit_Elements_to_Cartesian_State_Vectors.pdf
+
 using System.Numerics;
 using System.Text.Json.Serialization;
 
@@ -9,15 +12,64 @@ public struct Orbit
 {
     public string Name { get; set; }
     public string ParentName { get; set; }
-    public double Apoapsis { get; set; }
-    public double Periapsis { get; set; }
-    public double Inclination { get; set; }
-    public double ArgumentOfPeriapsis { get; set; }
-    public double SemiMajorAxis { get { return (Apoapsis + Periapsis) / 2; } }
-    public double SemiMinorAxis { get { return Math.Sqrt(Apoapsis * Periapsis); } }
-    public double Eccentricity { get { return LinearEccentricity / SemiMajorAxis; } }
-    public double LinearEccentricity { get { return SemiMajorAxis - Periapsis; } }
-    public Orbit(double apoapsis, double periapsis, double inclination, double argumentOfPeriapsis, string name = "Planet", string parentName = "Sun")
+    public double Apoapsis
+    {
+        get { return Apoapsis; }
+        set
+        {
+            Apoapsis = value;
+            SemiMajorAxis = (Apoapsis + Periapsis) / 2;
+            SemiMinorAxis = Math.Sqrt(Apoapsis * Periapsis);
+            LinearEccentricity = SemiMajorAxis - Periapsis;
+            Eccentricity = LinearEccentricity / SemiMajorAxis;
+        }
+    }
+    public double Periapsis
+    {
+        get { return Periapsis; }
+        set
+        {
+            Periapsis = value;
+            SemiMajorAxis = (Apoapsis + Periapsis) / 2;
+            SemiMinorAxis = Math.Sqrt(Apoapsis * Periapsis);
+            LinearEccentricity = SemiMajorAxis - Periapsis;
+            Eccentricity = LinearEccentricity / SemiMajorAxis;
+        }
+    }
+    public double Inclination
+    {
+        get { return Inclination; }
+        set
+        {
+            Inclination = value;
+            transformationMatrix = GetTransformationMatrix();
+        }
+    }
+    public double ArgumentOfPeriapsis
+    {
+        get { return ArgumentOfPeriapsis; }
+        set
+        {
+            ArgumentOfPeriapsis = value;
+            transformationMatrix = GetTransformationMatrix();
+        }
+    }
+    public double LongitudeOfAscendingNode
+    {
+        get { return LongitudeOfAscendingNode; }
+        set
+        {
+            LongitudeOfAscendingNode = value;
+            transformationMatrix = GetTransformationMatrix();
+        }
+    }
+    public double MeanAnomalyAtEpochRadians { get; set; }
+    public double SemiMajorAxis { get; set; }
+    public double SemiMinorAxis { get; set; }
+    public double LinearEccentricity { get; set; }
+    public double Eccentricity { get; set; }
+    public double[,] transformationMatrix;
+    public Orbit(double apoapsis = 1, double periapsis = 1, double inclination = 0, double argumentOfPeriapsis = 0, double longitudeOfAscendingNode = 0, double meanAnomalyAtEpochRadians = 0, string name = "Planet", string parentName = "Star")
     {
         Name = name;
         ParentName = parentName;
@@ -27,6 +79,28 @@ public struct Orbit
         Periapsis = periapsis;
         Inclination = inclination;
         ArgumentOfPeriapsis = argumentOfPeriapsis;
+        LongitudeOfAscendingNode = longitudeOfAscendingNode;
+        MeanAnomalyAtEpochRadians = meanAnomalyAtEpochRadians;
+        transformationMatrix = GetTransformationMatrix();
+    }
+    private double[,] GetTransformationMatrix()
+    {
+        double[,] matrix = new double[3,2];
+        double sinInc   = Math.Sin(Inclination),              cosInc   = Math.Cos(Inclination);
+        double sinArgPe = Math.Sin(ArgumentOfPeriapsis),      cosArgPe = Math.Cos(ArgumentOfPeriapsis);
+        double sinLAN   = Math.Sin(LongitudeOfAscendingNode), cosLAN   = Math.Cos(LongitudeOfAscendingNode);
+
+        // https://downloads.rene-schwarz.com/download/M001-Keplerian_Orbit_Elements_to_Cartesian_State_Vectors.pdf
+        matrix[0, 0] = sinArgPe * cosLAN - sinArgPe * cosInc * sinLAN;
+        matrix[0, 1] = -(sinArgPe * cosLAN + cosArgPe * cosInc * sinLAN);
+
+        matrix[1, 0] = cosArgPe * sinLAN + sinArgPe * cosInc * cosLAN;
+        matrix[1, 1] = cosArgPe * cosInc * cosLAN - sinArgPe * sinLAN;
+
+        matrix[2, 0] = sinArgPe * sinInc;
+        matrix[2, 1] = cosArgPe * sinInc;
+
+        return matrix;
     }
     public double GetEccentricAnomaly(double meanAnomaly)
     {
@@ -50,10 +124,10 @@ public struct Orbit
 
         return eccentricAnomaly;
     }
-    public (double, double, double) GetTimeAdjustedPosition(double t)
+    public (double, double, double) GetPositionAtTime(double t)
     {
-        t = (t % 1 + 1) % 1; // modulo that supports negatives
-        double meanAnomaly = t * Math.Tau;
+        t = Modulo(t, 1);
+        double meanAnomaly = t * Math.Tau + MeanAnomalyAtEpochRadians;
         double eccentricAnomaly = GetEccentricAnomaly(meanAnomaly);
 
         double x = SemiMajorAxis * (Math.Cos(eccentricAnomaly) - Eccentricity);
@@ -64,7 +138,7 @@ public struct Orbit
 
     public (double, double, double) GetPositionAtAngle(double revolutions)
     {
-        revolutions = (revolutions % 1 + 1) % 1; // modulo that supports negatives
+        revolutions = Modulo(revolutions, 1);
         double trueAnomaly = revolutions * Math.Tau;
 
         double x = SemiMajorAxis * (Math.Cos(trueAnomaly) - Eccentricity);
@@ -72,20 +146,14 @@ public struct Orbit
 
         return TiltPosition(x, y);
     }
-
     public (double, double, double) TiltPosition(double x, double y)
     {
-        double inclineRadians = Inclination * Math.PI / 180.0;
-        double periapsisRadians = ArgumentOfPeriapsis * Math.PI / 180.0;
-
-        double newX = x * Math.Cos(inclineRadians) - y * Math.Sin(inclineRadians);
-        double newY = x * Math.Sin(inclineRadians) + y * Math.Cos(inclineRadians);
-
-        double newZ = -newX * Math.Sin(periapsisRadians);
-        newX *= Math.Cos(periapsisRadians);
-
+        double newX = x * transformationMatrix[0, 0] + y * transformationMatrix[0, 1];
+        double newY = x * transformationMatrix[1, 0] + y * transformationMatrix[1, 1];
+        double newZ = x * transformationMatrix[2, 0] + y * transformationMatrix[2, 1];
         return (newX, newY, newZ);
     }
+
     public (double, double, double)[] SampleAngleBasedPoints(int samples)
     {
         (double, double, double)[] sampleArray = new (double, double, double)[samples];
@@ -104,9 +172,16 @@ public struct Orbit
     }
 
     public override string ToString()
-    { return $"{ParentName}>{Name}: {Apoapsis}x{Periapsis}"; }
+    {
+        return $"{ParentName}>{Name}: {Apoapsis}x{Periapsis}";
+    }
     public string ToStringDetail()
-    { return $"{ParentName}>{Name}: {Apoapsis}x{Periapsis}, {Inclination}°/{ArgumentOfPeriapsis}°"; }
+    {
+        return $"{ParentName}>{Name}: {Apoapsis}x{Periapsis}, {Inclination}°i/{ArgumentOfPeriapsis}°ω/{LongitudeOfAscendingNode}°Ω";
+    }
+
+    // A modulo implementation that supports negatives.
+    private double Modulo(double a, double b) { return (a % b + b) % b; }
 }
 
 
@@ -130,7 +205,7 @@ public static class OrbitalMechanics
         return 1 - (e * Math.Cos(E));
     }
 
-    public static double SolveKepler(double M, double e)
+    public static double GetEccentricAnomaly(double M, double e)
     {
         double targetAccuracy = 1e-9;
         int maxIterations = 1000;
@@ -151,60 +226,5 @@ public static class OrbitalMechanics
         }
         
         return E;
-    }
-
-    /// <param name="ap">Apoapsis</param>
-    /// <param name="pe">Periapsis</param>
-    /// <param name="t">Time</param>
-    /// <returns>a 2D vector</returns>
-    public static (double, double, double) ConvertOrbitToXYZ(double ap, double pe, double t, double inclination, double argOfPe)
-    {
-        t %= 1;
-        double semiMajorAxis = (ap + pe) / 2;
-        double semiMinorAxis = Math.Sqrt(ap + pe);
-
-        double meanAnomaly = t * Math.Tau;
-        double linearEccentricity = semiMajorAxis - pe;
-        double eccentricity = linearEccentricity / semiMajorAxis;
-
-        double eccentricAnomaly = SolveKepler(meanAnomaly, eccentricity);
-
-        double x = semiMajorAxis * (Math.Cos(eccentricAnomaly) - eccentricity);
-        double y = semiMinorAxis * Math.Sin(eccentricAnomaly);
-
-        return CalculateInclinedPosition(x, y, inclination, argOfPe);
-    }
-
-    public static (double, double, double) ConvertOrbitAngleToXYZ(double ap, double pe, double revolutions, double inclination, double argOfPe)
-    {
-        revolutions %= 1;
-        double semiMajorAxis = (ap + pe) / 2;
-        double semiMinorAxis = Math.Sqrt(ap + pe);
-        double trueAnomaly = revolutions * Math.Tau;
-
-        double linearEccentricity = semiMajorAxis - pe;
-        double eccentricity = linearEccentricity / semiMajorAxis;
-
-        double x = semiMajorAxis * (Math.Cos(trueAnomaly) - eccentricity);
-        double y = semiMinorAxis * Math.Sin(trueAnomaly);
-
-        return CalculateInclinedPosition(x, y, inclination, argOfPe);
-    }
-
-    public static (double, double, double) CalculateInclinedPosition(double x, double y, double inclination, double argOfPe)
-    {
-
-        double inclineRadians = inclination * Math.PI / 180.0;
-        double periapsisRadians = argOfPe * Math.PI / 180.0;
-
-        double newX = x * Math.Cos(inclineRadians) - y * Math.Sin(inclineRadians);
-        double newY = x * Math.Sin(inclineRadians) + y * Math.Cos(inclineRadians);
-        // double Z = 0.0; // Assuming z is initially 0
-
-        // Rotate around the y-axis (argument of periapsis)
-        double newZ = -newX * Math.Sin(periapsisRadians); // + Z * Math.Cos(periapsisRadians);
-        newX *= Math.Cos(periapsisRadians); // + Z * Math.Sin(periapsisRadians);
-
-        return (newX, newY, newZ);
     }
 }

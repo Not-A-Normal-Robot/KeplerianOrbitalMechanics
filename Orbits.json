@@ -1,28 +1,164 @@
 {
   "orbits": [
     {
-      "Name": "Astralis",
-      "ParentName": "Solara",
+      "Name": "Moho",
+      "ParentName": "Kerbol",
       "Apoapsis": 6315765981.0,
       "Periapsis": 4210510628.0,
       "Inclination": 7.0,
-      "ArgumentOfPeriapsis": 15.0
+      "ArgumentOfPeriapsis": 15.0,
+      "LongitudeOfAscendingNode": 70.0,
+      "MeanAnomalyAtEpochRadians": 3.14
     },
     {
-      "Name": "Veridian",
-      "ParentName": "Solara",
+      "Name": "Eve",
+      "ParentName": "Kerbol",
       "Apoapsis": 9931011387.0,
       "Periapsis": 9734357701.0,
       "Inclination": 2.1,
-      "ArgumentOfPeriapsis": 0.0
+      "ArgumentOfPeriapsis": 0.0,
+      "LongitudeOfAscendingNode": 15.0,
+      "MeanAnomalyAtEpochRadians": 3.14
     },
     {
-      "Name": "Lunara",
-      "ParentName": "Veridian",
-      "Apoapsis": 0.1,
-      "Periapsis": 0.09,
-      "Inclination": 1.0,
-      "ArgumentOfPeriapsis": 30.0
+      "Name": "Gilly",
+      "ParentName": "Eve",
+      "Apoapsis": 48825000.0,
+      "Periapsis": 14175000.0,
+      "Inclination": 12.0,
+      "ArgumentOfPeriapsis": 10.0,
+      "LongitudeOfAscendingNode": 80.0,
+      "MeanAnomalyAtEpochRadians": 0.9
+    },
+    {
+      "Name": "Kerbin",
+      "ParentName": "Kerbol",
+      "Apoapsis": 13599840256.0,
+      "Periapsis": 13599840256.0,
+      "Inclination": 0.0,
+      "ArgumentOfPeriapsis": 0.0,
+      "LongitudeOfAscendingNode": 0.0,
+      "MeanAnomalyAtEpochRadians": 3.14
+    },
+    {
+      "Name": "The Mun",
+      "ParentName": "Kerbin",
+      "Apoapsis": 12000000.0,
+      "Periapsis": 12000000.0,
+      "Inclination": 0.0,
+      "ArgumentOfPeriapsis": 0.0,
+      "LongitudeOfAscendingNode": 0.0,
+      "MeanAnomalyAtEpochRadians": 1.7
+    },
+    {
+      "Name": "Minmus",
+      "ParentName": "Kerbin",
+      "Apoapsis": 47000000.0,
+      "Periapsis": 47000000.0,
+      "Inclination": 6.0,
+      "ArgumentOfPeriapsis": 38.0,
+      "LongitudeOfAscendingNode": 78.0,
+      "MeanAnomalyAtEpochRadians": 0.9
+    },
+    {
+      "Name": "Duna",
+      "ParentName": "Kerbol",
+      "Apoapsis": 21783189163.0,
+      "Periapsis": 19669121365.0,
+      "Inclination": 0.06,
+      "ArgumentOfPeriapsis": 0.0,
+      "LongitudeOfAscendingNode": 135.5,
+      "MeanAnomalyAtEpochRadians": 3.14
+    },
+    {
+      "Name": "Ike",
+      "ParentName": "Duna",
+      "Apoapsis": 3296000.0,
+      "Periapsis": 3104000.0,
+      "Inclination": 0.2,
+      "ArgumentOfPeriapsis": 0.0,
+      "LongitudeOfAscendingNode": 0.0,
+      "MeanAnomalyAtEpochRadians": 1.7
+    },
+    {
+      "Name": "Dres",
+      "ParentName": "Kerbol",
+      "Apoapsis": 46761053692.0,
+      "Periapsis": 34917642714.0,
+      "Inclination": 5,
+      "ArgumentOfPeriapsis": 90.0,
+      "LongitudeOfAscendingNode": 280.0,
+      "MeanAnomalyAtEpochRadians": 3.14
+    },
+    {
+      "Name": "Jool",
+      "ParentName": "Kerbol",
+      "Apoapsis": 72212238387.0,
+      "Periapsis": 65334882253.0,
+      "Inclination": 1.304,
+      "ArgumentOfPeriapsis": 0.0,
+      "LongitudeOfAscendingNode": 52.0,
+      "MeanAnomalyAtEpochRadians": 0.1
+    },
+    {
+      "Name": "Laythe",
+      "ParentName": "Jool",
+      "Apoapsis": 27184000.0,
+      "Periapsis": 27184000.0,
+      "Inclination": 0.0,
+      "ArgumentOfPeriapsis": 0.0,
+      "LongitudeOfAscendingNode": 0.0,
+      "MeanAnomalyAtEpochRadians": 3.14
+    },
+    {
+      "Name": "Vall",
+      "ParentName": "Jool",
+      "Apoapsis": 43152000.0,
+      "Periapsis": 43152000.0,
+      "Inclination": 0.0,
+      "ArgumentOfPeriapsis": 0.0,
+      "LongitudeOfAscendingNode": 0.0,
+      "MeanAnomalyAtEpochRadians": 0.9
+    },
+    {
+      "Name": "Tylo",
+      "ParentName": "Jool",
+      "Apoapsis": 68500000.0,
+      "Periapsis": 68500000.0,
+      "Inclination": 0.025,
+      "ArgumentOfPeriapsis": 0.0,
+      "LongitudeOfAscendingNode": 0.0,
+      "MeanAnomalyAtEpochRadians": 3.14
+    },
+    {
+      "Name": "Bop",
+      "ParentName": "Jool",
+      "Apoapsis": 158697500.0,
+      "Periapsis": 98302500.0,
+      "Inclination": 15.0,
+      "ArgumentOfPeriapsis": 25.0,
+      "LongitudeOfAscendingNode": 10.0,
+      "MeanAnomalyAtEpochRadians": 0.9
+    },
+    {
+      "Name": "Pol",
+      "ParentName": "Jool",
+      "Apoapsis": 210624207.0,
+      "Periapsis": 149155794.0,
+      "Inclination": 4.25,
+      "ArgumentOfPeriapsis": 15.0,
+      "LongitudeOfAscendingNode": 2.0,
+      "MeanAnomalyAtEpochRadians": 0.9
+    },
+    {
+      "Name": "Eeloo",
+      "ParentName": "Kerbol",
+      "Apoapsis": 113549713200.0,
+      "Periapsis": 66687926800.0,
+      "Inclination": 6.15,
+      "ArgumentOfPeriapsis": 260.0,
+      "LongitudeOfAscendingNode": 50.0,
+      "MeanAnomalyAtEpochRadians": 3.14
     }
   ]
 }
